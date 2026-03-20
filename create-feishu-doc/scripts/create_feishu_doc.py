@@ -374,116 +374,160 @@ class FeishuDocCreator:
 def main():
     """主函数，示例用法"""
     
-    # 示例内容
-    example_title = "iOS闹钟App PRD文档"
+    # 示例内容 - 通用文档示例
+    example_title = "示例文档：Python编程入门"
     
-    example_content = """# iOS闹钟App PRD文档
+    example_content = """# Python编程入门指南
 
-## 产品概述
+## 第一章：Python基础
 
-### 产品愿景
-打造一款简洁、优雅、功能完善的iOS原生闹钟应用，为用户提供可靠的起床提醒和日程管理工具。
+### 1.1 Python简介
+Python是一种高级、解释型的编程语言，由Guido van Rossum于1991年创建。它以简洁明了的语法和强大的功能而闻名，广泛应用于Web开发、数据分析、人工智能等领域。
 
-### 目标用户
-1. 学生群体 (18-25岁)
-   - 需要规律作息
-   - 对界面美观度要求高
-   - 喜欢个性化设置
+### 1.2 安装Python
+1. 访问Python官网下载安装包
+2. 按照安装向导完成安装
+3. 验证安装：在终端输入`python --version`
 
-2. 上班族 (25-45岁)
-   - 需要准时起床
-   - 重视可靠性和稳定性
-   - 需要工作日/周末不同设置
+### 1.3 第一个Python程序
+```python
+print("Hello, World!")
+```
+保存为hello.py，在终端运行：`python hello.py`
 
-3. 中老年用户 (45岁以上)
-   - 需要大字体显示
-   - 操作简单直观
-   - 铃声清晰响亮
+## 第二章：基本语法
 
-### 核心价值主张
-- 可靠性：100%准时响铃，绝不漏闹
-- 简洁性：界面直观，3步完成闹钟设置
-- 个性化：丰富的铃声和主题选择
-- 智能化：智能跳过节假日，自动调整
+### 2.1 变量和数据类型
+Python支持多种数据类型：
+- 整数：`age = 25`
+- 浮点数：`price = 19.99`
+- 字符串：`name = "Alice"`
+- 布尔值：`is_student = True`
+- 列表：`fruits = ["apple", "banana", "orange"]`
 
-## 核心功能需求
+### 2.2 控制流
+```python
+# 条件语句
+if age >= 18:
+    print("成年人")
+else:
+    print("未成年人")
 
-### 基础功能模块
-1. 闹钟设置与管理
-2. 重复周期设置
-3. 贪睡功能
-4. 铃声系统
+# 循环语句
+for i in range(5):
+    print(i)
 
-### 高级功能模块
-1. 主题与个性化
-2. 智能功能
-3. 快捷操作
+# while循环
+count = 0
+while count < 5:
+    print(count)
+    count += 1
+```
 
-### 辅助功能
-- 震动模式
-- 无障碍支持
-- 语音报时
+### 2.3 函数
+```python
+def greet(name):
+    return f"Hello, {name}!"
 
-## 技术实现方案
+result = greet("Alice")
+print(result)  # 输出：Hello, Alice!
+```
 
-### 技术栈
-- 开发语言：Swift 6.0+
-- UI框架：SwiftUI
-- 架构模式：MVVM + Combine
-- 最低支持：iOS 18+
+## 第三章：高级特性
 
-### 核心组件
-- 本地通知系统
-- 数据持久化
-- 音频播放系统
+### 3.1 列表推导式
+```python
+# 生成1到10的平方列表
+squares = [x**2 for x in range(1, 11)]
+print(squares)  # 输出：[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
+```
 
-## 项目时间规划
+### 3.2 异常处理
+```python
+try:
+    result = 10 / 0
+except ZeroDivisionError:
+    print("不能除以零")
+finally:
+    print("程序执行完毕")
+```
 
-### 开发阶段（9周）
-- 阶段一：基础框架（2周）
-- 阶段二：核心功能（3周）
-- 阶段三：高级功能（2周）
-- 阶段四：测试优化（2周）
+### 3.3 文件操作
+```python
+# 写入文件
+with open("example.txt", "w") as file:
+    file.write("Hello, Python!")
 
-### 里程碑
-1. M1：基础框架完成
-2. M2：核心功能完成
-3. M3：高级功能完成
-4. M4：准备上架
+# 读取文件
+with open("example.txt", "r") as file:
+    content = file.read()
+    print(content)
+```
 
-## 成功指标
+## 第四章：实际应用
 
-### 产品指标
-- App Store评分 > 4.5星
-- 日活跃用户 > 10,000
-- 7日留存率 > 40%
-- 崩溃率 < 0.1%
+### 4.1 Web开发
+使用Flask框架创建简单的Web应用：
+```python
+from flask import Flask
+app = Flask(__name__)
 
-## 风险与应对
+@app.route('/')
+def hello():
+    return 'Hello, World!'
 
-### 技术风险
-- 风险：iOS通知限制
-- 应对：精确触发、后台任务
+if __name__ == '__main__':
+    app.run()
+```
 
-### 产品风险
-- 风险：与系统闹钟重叠
-- 应对：突出个性化、强化智能
+### 4.2 数据分析
+使用pandas库处理数据：
+```python
+import pandas as pd
 
-### 市场风险
-- 风险：竞争激烈
-- 应对：专注iOS优化、口碑推荐
+# 创建DataFrame
+data = {'Name': ['Alice', 'Bob', 'Charlie'],
+        'Age': [25, 30, 35],
+        'City': ['New York', 'London', 'Tokyo']}
+df = pd.DataFrame(data)
 
-## 后续计划
+print(df)
+```
 
-### 版本规划
-- v1.0：基础闹钟功能
-- v1.1：睡眠分析统计
-- v1.2：健康数据集成
-- v2.0：社交智能场景
+### 4.3 自动化脚本
+```python
+import os
+import datetime
+
+# 获取当前时间
+now = datetime.datetime.now()
+print(f"当前时间：{now}")
+
+# 列出目录内容
+files = os.listdir('.')
+print(f"当前目录文件：{files}")
+```
+
+## 学习资源
+
+### 推荐书籍
+1. 《Python编程：从入门到实践》
+2. 《流畅的Python》
+3. 《Python Cookbook》
+
+### 在线资源
+1. Python官方文档
+2. W3Schools Python教程
+3. Real Python教程网站
+
+### 练习项目
+1. 计算器程序
+2. 待办事项应用
+3. 天气查询工具
+4. 简单的博客系统
 
 ---
-文档创建时间：2026年3月20日
-产品经理：OpenClaw助手"""
+文档说明：这是一个通用的Python编程入门指南示例，用于演示文档创建功能。实际使用时，可以根据用户需求创建各种类型的文档。
     
     # 创建文档
     creator = FeishuDocCreator(example_title)
