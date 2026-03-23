@@ -1,7 +1,7 @@
 {
   "name": "create-feishu-doc",
-  "version": "1.0.5",
-  "description": "当用户请求创建飞书文档、生成飞书文档、写入飞书文档或将内容整理到飞书文档中时，必须使用该技能。适用于任何需要生成完整文档的场景，包括但不限于：技术文档、PRD、项目计划、报告、笔记、文章、小说等。",
+  "version": "1.0.6",
+  "description": "Use this skill whenever the user wants to create, generate, write to, or organize content into a Feishu document. Triggers include: any mention of 'Feishu doc', 'Feishu document', or requests to produce structured or complete documents within Feishu. This applies to scenarios requiring fully formatted documents, including but not limited to: technical documentation, PRDs, project plans, reports, notes, articles, or novels. Use this skill whenever content needs to be compiled, structured, and delivered as a Feishu document.",
   "main": "scripts/create_feishu_doc.py",
   "scripts": {
     "test": "python scripts/create_feishu_doc.py"
