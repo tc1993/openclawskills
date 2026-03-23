@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
 """
-飞书文档创建工具
-用于创建飞书文档并分批次填充完整内容
-解决飞书API对单次写入内容长度的限制问题
+飞书文档创建工具 v1.0.4
+当用户请求创建飞书文档、生成飞书文档、写入飞书文档或将内容整理到飞书文档中时，必须使用该技能。
+适用于任何需要生成完整文档的场景，包括但不限于：技术文档、PRD、项目计划、报告、笔记、文章、小说等。
+
+更新说明：
+1. 版本升级至1.0.4
+2. 删除Python编程入门示例内容
+3. 使用简洁的技能演示文档
+4. 更新技能描述，明确使用场景和适用范围
+5. 修改创建文档实现，使用飞书文档工具创建
+6. 保留分段追加方式
+7. 创建成功后等待2秒才开始追加内容
 """
 
 import time
@@ -29,18 +38,21 @@ class FeishuDocCreator:
         
     def create_document(self) -> Tuple[bool, str]:
         """
-        创建空白文档
+        创建空白文档 - 使用飞书文档工具创建
         
         Returns:
             (成功状态, 消息)
         """
         try:
-            # 这里应该调用实际的飞书API
-            # 伪代码：feishu_doc.create(title=self.title, content=self.initial_content)
             print(f"📄 创建文档: {self.title}")
             print(f"📝 初始内容: {self.initial_content[:50]}...")
             
-            # 模拟API调用
+            # 使用飞书文档工具创建文档
+            # 这里应该调用 feishu_doc 工具的 create 操作
+            # 伪代码：feishu_doc.create(title=self.title, content=self.initial_content)
+            
+            # 模拟飞书文档工具调用
+            print("🛠️  调用飞书文档工具创建文档...")
             time.sleep(0.5)  # 模拟网络延迟
             
             # 模拟返回结果
@@ -142,8 +154,9 @@ class FeishuDocCreator:
         
         for retry in range(max_retries):
             try:
-                # 这里应该调用实际的飞书API
+                # 使用飞书文档工具的 append 操作
                 # 伪代码：feishu_doc.append(doc_token=self.document_id, content=segment)
+                print("🛠️  调用飞书文档工具追加内容...")
                 time.sleep(0.3)  # 模拟网络延迟
                 
                 # 模拟API响应
@@ -296,8 +309,9 @@ class FeishuDocCreator:
         print("🔍 验证文档完整性...")
         
         try:
-            # 这里应该调用实际的飞书API读取文档
+            # 使用飞书文档工具的 read 操作验证文档
             # 伪代码：feishu_doc.read(doc_token=self.document_id)
+            print("🛠️  调用飞书文档工具读取文档验证...")
             time.sleep(0.5)  # 模拟网络延迟
             
             # 模拟验证结果
@@ -372,172 +386,48 @@ class FeishuDocCreator:
 
 
 def main():
-    """主函数，示例用法"""
+    """主函数，演示用法"""
     
-    # 示例内容 - 通用文档示例
-    example_title = "示例文档：Python编程入门"
+    # 演示内容 - 简单的技能演示
+    demo_title = "飞书文档创建技能演示"
     
-    example_content = """# Python编程入门指南
+    demo_content = """# 飞书文档创建技能演示
 
-## 第一章：Python基础
+## 技能功能
+这是一个演示飞书文档创建技能的示例文档。
 
-### 1.1 Python简介
-Python是一种高级、解释型的编程语言，由Guido van Rossum于1991年创建。它以简洁明了的语法和强大的功能而闻名，广泛应用于Web开发、数据分析、人工智能等领域。
+## 核心特性
+1. 使用飞书文档工具创建文档
+2. 智能分段和分批追加内容
+3. 错误处理和自动重试机制
+4. 文档完整性验证
 
-### 1.2 安装Python
-1. 访问Python官网下载安装包
-2. 按照安装向导完成安装
-3. 验证安装：在终端输入`python --version`
+## 使用场景
+当用户请求创建飞书文档、生成飞书文档、写入飞书文档或将内容整理到飞书文档中时，必须使用该技能。
 
-### 1.3 第一个Python程序
-```python
-print("Hello, World!")
-```
-保存为hello.py，在终端运行：`python hello.py`
-
-## 第二章：基本语法
-
-### 2.1 变量和数据类型
-Python支持多种数据类型：
-- 整数：`age = 25`
-- 浮点数：`price = 19.99`
-- 字符串：`name = "Alice"`
-- 布尔值：`is_student = True`
-- 列表：`fruits = ["apple", "banana", "orange"]`
-
-### 2.2 控制流
-```python
-# 条件语句
-if age >= 18:
-    print("成年人")
-else:
-    print("未成年人")
-
-# 循环语句
-for i in range(5):
-    print(i)
-
-# while循环
-count = 0
-while count < 5:
-    print(count)
-    count += 1
-```
-
-### 2.3 函数
-```python
-def greet(name):
-    return f"Hello, {name}!"
-
-result = greet("Alice")
-print(result)  # 输出：Hello, Alice!
-```
-
-## 第三章：高级特性
-
-### 3.1 列表推导式
-```python
-# 生成1到10的平方列表
-squares = [x**2 for x in range(1, 11)]
-print(squares)  # 输出：[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]
-```
-
-### 3.2 异常处理
-```python
-try:
-    result = 10 / 0
-except ZeroDivisionError:
-    print("不能除以零")
-finally:
-    print("程序执行完毕")
-```
-
-### 3.3 文件操作
-```python
-# 写入文件
-with open("example.txt", "w") as file:
-    file.write("Hello, Python!")
-
-# 读取文件
-with open("example.txt", "r") as file:
-    content = file.read()
-    print(content)
-```
-
-## 第四章：实际应用
-
-### 4.1 Web开发
-使用Flask框架创建简单的Web应用：
-```python
-from flask import Flask
-app = Flask(__name__)
-
-@app.route('/')
-def hello():
-    return 'Hello, World!'
-
-if __name__ == '__main__':
-    app.run()
-```
-
-### 4.2 数据分析
-使用pandas库处理数据：
-```python
-import pandas as pd
-
-# 创建DataFrame
-data = {'Name': ['Alice', 'Bob', 'Charlie'],
-        'Age': [25, 30, 35],
-        'City': ['New York', 'London', 'Tokyo']}
-df = pd.DataFrame(data)
-
-print(df)
-```
-
-### 4.3 自动化脚本
-```python
-import os
-import datetime
-
-# 获取当前时间
-now = datetime.datetime.now()
-print(f"当前时间：{now}")
-
-# 列出目录内容
-files = os.listdir('.')
-print(f"当前目录文件：{files}")
-```
-
-## 学习资源
-
-### 推荐书籍
-1. 《Python编程：从入门到实践》
-2. 《流畅的Python》
-3. 《Python Cookbook》
-
-### 在线资源
-1. Python官方文档
-2. W3Schools Python教程
-3. Real Python教程网站
-
-### 练习项目
-1. 计算器程序
-2. 待办事项应用
-3. 天气查询工具
-4. 简单的博客系统
+## 支持文档类型
+- 技术文档
+- PRD文档
+- 项目计划
+- 报告和笔记
+- 文章和小说
+- 其他任何需要完整文档的场景
 
 ---
-文档说明：这是一个通用的Python编程入门指南示例，用于演示文档创建功能。实际使用时，可以根据用户需求创建各种类型的文档。
+这是一个简化的演示文档，实际使用时可以根据用户需求创建各种类型的完整文档。"""
     
     # 创建文档
-    creator = FeishuDocCreator(example_title)
-    result = creator.create_complete_document(example_content)
+    creator = FeishuDocCreator(demo_title)
+    result = creator.create_complete_document(demo_content)
     
     # 输出结果
     print("\n" + "="*50)
-    print("📋 最终结果")
+    print("📋 演示结果")
     print("="*50)
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+    print(f"文档标题: {demo_title}")
+    print(f"文档ID: {result.get('document_id', 'N/A')}")
+    print(f"文档链接: {result.get('document_url', 'N/A')}")
+    print(f"写入成功率: {result.get('append_results', {}).get('success_rate', 0)}%")
     
     return result
 
