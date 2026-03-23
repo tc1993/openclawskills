@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
 """
-飞书文档创建工具 v1.0.4
-当用户请求创建飞书文档、生成飞书文档、写入飞书文档或将内容整理到飞书文档中时，必须使用该技能。
-适用于任何需要生成完整文档的场景，包括但不限于：技术文档、PRD、项目计划、报告、笔记、文章、小说等。
-
-更新说明：
-1. 版本升级至1.0.4
-2. 删除Python编程入门示例内容
-3. 使用简洁的技能演示文档
-4. 更新技能描述，明确使用场景和适用范围
-5. 修改创建文档实现，使用飞书文档工具创建
-6. 保留分段追加方式
-7. 创建成功后等待2秒才开始追加内容
+飞书文档创建工具
+用于创建飞书文档并分批次填充完整内容
+解决飞书API对单次写入内容长度的限制问题
 """
 
 import time
@@ -38,21 +29,18 @@ class FeishuDocCreator:
         
     def create_document(self) -> Tuple[bool, str]:
         """
-        创建空白文档 - 使用飞书文档工具创建
+        创建空白文档
         
         Returns:
             (成功状态, 消息)
         """
         try:
+            # 这里应该调用实际的飞书API
+            # 伪代码：feishu_doc.create(title=self.title, content=self.initial_content)
             print(f"📄 创建文档: {self.title}")
             print(f"📝 初始内容: {self.initial_content[:50]}...")
             
-            # 使用飞书文档工具创建文档
-            # 这里应该调用 feishu_doc 工具的 create 操作
-            # 伪代码：feishu_doc.create(title=self.title, content=self.initial_content)
-            
-            # 模拟飞书文档工具调用
-            print("🛠️  调用飞书文档工具创建文档...")
+            # 模拟API调用
             time.sleep(0.5)  # 模拟网络延迟
             
             # 模拟返回结果
@@ -154,9 +142,8 @@ class FeishuDocCreator:
         
         for retry in range(max_retries):
             try:
-                # 使用飞书文档工具的 append 操作
+                # 这里应该调用实际的飞书API
                 # 伪代码：feishu_doc.append(doc_token=self.document_id, content=segment)
-                print("🛠️  调用飞书文档工具追加内容...")
                 time.sleep(0.3)  # 模拟网络延迟
                 
                 # 模拟API响应
@@ -309,9 +296,8 @@ class FeishuDocCreator:
         print("🔍 验证文档完整性...")
         
         try:
-            # 使用飞书文档工具的 read 操作验证文档
+            # 这里应该调用实际的飞书API读取文档
             # 伪代码：feishu_doc.read(doc_token=self.document_id)
-            print("🛠️  调用飞书文档工具读取文档验证...")
             time.sleep(0.5)  # 模拟网络延迟
             
             # 模拟验证结果
@@ -386,48 +372,43 @@ class FeishuDocCreator:
 
 
 def main():
-    """主函数，演示用法"""
+    """主函数，通用文档创建示例"""
     
-    # 演示内容 - 简单的技能演示
-    demo_title = "飞书文档创建技能演示"
+    # 用户需要提供文档标题和内容
+    print("📝 通用飞书文档创建工具")
+    print("="*50)
     
-    demo_content = """# 飞书文档创建技能演示
-
-## 技能功能
-这是一个演示飞书文档创建技能的示例文档。
-
-## 核心特性
-1. 使用飞书文档工具创建文档
-2. 智能分段和分批追加内容
-3. 错误处理和自动重试机制
-4. 文档完整性验证
-
-## 使用场景
-当用户请求创建飞书文档、生成飞书文档、写入飞书文档或将内容整理到飞书文档中时，必须使用该技能。
-
-## 支持文档类型
-- 技术文档
-- PRD文档
-- 项目计划
-- 报告和笔记
-- 文章和小说
-- 其他任何需要完整文档的场景
-
----
-这是一个简化的演示文档，实际使用时可以根据用户需求创建各种类型的完整文档。"""
+    # 获取用户输入
+    title = input("请输入文档标题: ").strip()
+    if not title:
+        title = "未命名文档"
+    
+    print("请输入文档内容（输入空行结束）:")
+    content_lines = []
+    while True:
+        try:
+            line = input()
+            if line == "":
+                break
+            content_lines.append(line)
+        except EOFError:
+            break
+    
+    full_content = '\n'.join(content_lines)
+    
+    if not full_content.strip():
+        print("⚠️  未提供文档内容，使用示例内容")
+        full_content = "# 示例文档\n\n这是一个示例文档，请替换为实际内容。"
     
     # 创建文档
-    creator = FeishuDocCreator(demo_title)
-    result = creator.create_complete_document(demo_content)
+    creator = FeishuDocCreator(title)
+    result = creator.create_complete_document(full_content)
     
     # 输出结果
     print("\n" + "="*50)
-    print("📋 演示结果")
+    print("📋 最终结果")
     print("="*50)
-    print(f"文档标题: {demo_title}")
-    print(f"文档ID: {result.get('document_id', 'N/A')}")
-    print(f"文档链接: {result.get('document_url', 'N/A')}")
-    print(f"写入成功率: {result.get('append_results', {}).get('success_rate', 0)}%")
+    print(json.dumps(result, indent=2, ensure_ascii=False))
     
     return result
 
