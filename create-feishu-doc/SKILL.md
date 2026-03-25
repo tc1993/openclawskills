@@ -1,184 +1,145 @@
 ---
 name: create-feishu-doc
-description: "Use this skill whenever the user wants to create, generate, write to, or organize content into a Feishu document. Triggers include: any mention of 'Feishu doc', 'Feishu document', or requests to produce structured or complete documents within Feishu. This applies to scenarios requiring fully formatted documents, including but not limited to: technical documentation, PRDs, project plans, reports, notes, articles, or novels. Use this skill whenever content needs to be compiled, structured, and delivered as a Feishu document."
+description: "Use this skill whenever the user wants to create, generate, write to, or organize content into a Feishu document. Triggers include: any mention of 'Feishu doc', 'Feishu document', '飞书文档', '创建飞书文档', '生成飞书文档', or requests to produce structured or complete documents within Feishu. This applies to scenarios requiring fully formatted documents, including but not limited to: technical documentation, PRDs, project plans, reports, notes, articles, or novels. Use this skill whenever content needs to be compiled, structured, and delivered as a Feishu document."
 ---
 
-# Universal Feishu Document Creation Skill
+# 通用飞书文档创建技能
 
-## Overview
+## 概述
 
-This skill provides universal Feishu document creation functionality, creating documents based on any content provided by the user. It supports various document types: novels, technical documentation, project plans, reports, notes, articles, etc. 
+本技能提供通用的飞书文档创建功能，根据用户提供的任意内容创建文档。支持各种文档类型：小说、技术文档、项目计划、报告、笔记、文章等。由于飞书文档API对单次写入内容长度有限制，本技能通过智能分段、分批写入和重试机制确保各种长文档的完整创建。
 
-**⚠️ 重要提示：由于飞书文档API对单次写入操作的长度有限制，写入飞书文档时必须使用分段写入策略！**
+## 核心工作流程
 
-### 为什么必须分段写入？
-1. **API限制**：飞书文档API对单次请求的内容长度有严格限制
-2. **稳定性**：长内容一次性写入容易导致超时或失败
-3. **可靠性**：分段写入可以确保即使部分失败也能保留已写入内容
-4. **性能**：分段写入可以更好地处理网络波动和服务器响应
+### 第一步：创建空白文档
+1. 调用飞书API的`feishu_doc`工具的`create`操作
+2. 传入文档标题和初始内容（通常只包含标题）
+3. 记录返回的`document_id`和文档URL
 
-### 分段写入原则：
-- **每段300-500字**：避免单次写入内容过长
-- **按逻辑分段**：按章节、段落或主题自然分割
-- **保持完整性**：不在句子中间切断内容
-- **适当等待**：段与段之间等待1-2秒，确保文档稳定
+### 第二步：等待文档初始化
+1. 等待2秒钟，确保文档在飞书服务端完全初始化
+2. 这是关键步骤，避免在文档未就绪时进行写入操作
 
-## Core Workflow
+### 第三步：分批次追加内容
+1. 将完整内容按逻辑分段（每段约300-500字）
+2. 对每个内容段：
+   - 调用`feishu_doc`工具的`append`操作
+   - 使用上一步获取的`document_id`
+   - 等待1秒后再处理下一段
+3. 内容分段建议：
+   - 按自然段落或章节分段（如：小说章节、文档章节、主题段落等）
+   - 避免单段内容过长导致API失败（建议300-500字/段）
+   - 保持逻辑完整性，不在句子中间切断
+   - 根据内容类型智能分段：小说按章节、技术文档按主题、报告按部分
 
-### Step 1: Create Blank Document
-1. Call the `feishu_doc` tool's `create` operation
-2. Pass in the document title and initial content (usually just the title)
-3. Record the returned `document_id` and document URL
+### 第四步：错误处理和重试
+1. 如果`append`操作失败（返回400错误）：
+   - 等待2秒后重试
+   - 最多重试3次
+   - 如果仍然失败，记录错误并继续下一段
+2. 重试时可以考虑：
+   - 减少内容长度
+   - 简化格式（移除复杂Markdown）
+   - 检查网络连接
 
-### Step 2: Wait for Document Initialization
-1. Wait 2 seconds to ensure the document is fully initialized on the Feishu server
-2. This is a critical step to avoid write operations before the document is ready
+## 最佳实践
 
-### Step 3: Append Content in Batches (必须分段写入！)
-**重要：这是整个流程中最关键的步骤，必须严格遵守分段写入原则！**
-
-1. **内容分段策略**：
-   - 将完整内容按逻辑分割成多个小段
-   - **每段建议300-500字**，绝对不能超过1000字
-   - 按自然段落、章节或主题进行分割
-   - 避免在句子中间切断内容
-
-2. **分段写入操作**：
-   - 对每个内容段调用 `feishu_doc` 工具的 `append` 操作
-   - 使用上一步获取的 `document_id`
-   - **每段写入后等待1-2秒**，确保文档稳定
-
-3. **分段建议**：
-   - 小说：按章节分段
-   - 技术文档：按主题或小节分段
-   - 报告：按章节或主要部分分段
-   - 长文章：按逻辑段落分段
-
-**⚠️ 警告：不要尝试一次性写入过长内容，这会导致API失败！**
-
-### Step 4: Error Handling and Retry
-1. If the `append` operation fails (returns 400 error):
-   - Wait 2 seconds and retry
-   - Maximum of 3 retries
-   - If still failing, record the error and continue with the next segment
-2. When retrying, consider:
-   - Reducing content length
-   - Simplifying format (removing complex Markdown)
-   - Checking network connection
-
-## Best Practices
-
-### 内容分段策略 (必须遵守！)
-- **小段优先原则**：每段300-500字，避免API限制
-- **逻辑完整性**：按章节或主题分段，不在句子中间切断
+### 内容分段策略
+- **小段落优先**：每段300-500字，避免API限制
+- **逻辑完整**：按章节或主题分段，不在句子中间切断
 - **格式简化**：使用飞书支持的简单格式（纯文本、简单列表）
-- **进度跟踪**：记录已写入段数和总段数
+- **进度跟踪**：记录已写入的段落数和总段落数
 
-### 分段写入检查清单：
-1. ✅ 内容是否已按逻辑分段？
-2. ✅ 每段是否不超过500字？
-3. ✅ 是否避免了在句子中间切断？
-4. ✅ 段与段之间是否有适当等待时间？
-5. ✅ 是否记录了写入进度？
+### 错误处理策略
+- **立即重试**：首次失败后等待2秒重试
+- **降级处理**：重试失败时简化内容格式
+- **跳过继续**：单个段落失败不影响整体进度
+- **最终验证**：所有段落写入后读取文档验证完整性
 
-### Error Handling Strategy
-- **Immediate retry**: Wait 2 seconds and retry after first failure
-- **Graceful degradation**: Simplify content format when retry fails
-- **Skip and continue**: Failure of a single segment doesn't affect overall progress
-- **Final verification**: Read the document to verify completeness after all segments are written
+### 性能优化
+- **并行写入**：可以同时处理多个文档
+- **批量操作**：相似内容可以合并写入
+- **缓存利用**：重复内容可以缓存避免重复生成
+- **进度保存**：支持断点续传，记录已完成的段落
 
-### Performance Optimization
-- **Parallel writing**: Can process multiple documents simultaneously
-- **Batch operations**: Similar content can be merged and written together
-- **Cache utilization**: Repeated content can be cached to avoid regeneration
-- **Progress saving**: Supports resumable transmission, records completed segments
+## 使用示例
 
-## Usage Examples
-
-### Example 1: Creating Novel Chapter Documents
+### 示例1：创建小说章节文档
 ```python
-# Pseudo-code example
-1. create_doc("Sword Coming Chapter 1")
+# 伪代码示例
+1. create_doc("剑来小说第一章")
 2. wait(2)
-3. append_content("Section 1: Town Youth...")
+3. append_content("第一节：小镇少年...")
 4. wait(1)
-5. append_content("Section 2: Market Adventure...")
+5. append_content("第二节：集市奇遇...")
 6. wait(1)
-7. append_content("Section 3: Mysterious Prophecy...")
-8. Verify document completeness
+7. append_content("第三节：神秘预言...")
+8. 验证文档完整性
 ```
 
-### Example 2: Creating Technical Documentation
+### 示例2：创建技术文档
 ```python
-# Pseudo-code example
-1. create_doc("Python Programming Guide")
+# 伪代码示例
+1. create_doc("Python编程指南")
 2. wait(2)
-3. append_content("Chapter 1: Python Basics...")
+3. append_content("第一章：Python基础...")
 4. wait(1)
-5. append_content("Chapter 2: Functions and Modules...")
+5. append_content("第二章：函数和模块...")
 6. wait(1)
-7. append_content("Chapter 3: Object-Oriented Programming...")
-8. Verify document completeness
+7. append_content("第三章：面向对象编程...")
+8. 验证文档完整性
 ```
 
-### Example 3: Universal Document Creation Process
+### 示例3：通用文档创建流程
 ```python
-# Pseudo-code example
-1. Get document title and content from user input
-2. Create blank document
-3. Wait for document initialization
-4. Intelligently segment the content
-5. Write all segments in batches
-6. Handle errors and retries
-7. Verify document completeness
-8. Return document link and creation results
+# 伪代码示例
+1. 获取用户输入的文档标题和内容
+2. 创建空白文档
+3. 等待文档初始化
+4. 将内容智能分段
+5. 分批次写入所有段落
+6. 处理错误和重试
+7. 验证文档完整性
+8. 返回文档链接和创建结果
 ```
 
-## Common Problem Solving
+## 常见问题解决
 
-### 问题1: API返回400错误
+### 问题1：API返回400错误
 **原因**：内容过长或格式不支持
-**解决方案**：
-1. **减少单次写入内容长度**（这是最常见原因！）
-2. 移除复杂的Markdown格式
+**解决**：
+1. 减少单次写入内容长度
+2. 移除复杂Markdown格式
 3. 使用纯文本格式重试
 
-### 分段写入失败排查：
-1. **检查分段大小**：是否超过500字？
-2. **检查等待时间**：段与段之间是否等待了足够时间？
-3. **检查内容格式**：是否包含飞书不支持的格式？
-4. **检查网络连接**：网络是否稳定？
+### 问题2：文档内容丢失
+**原因**：写入操作未成功但未检测到
+**解决**：
+1. 每次写入后验证返回状态
+2. 记录每个段落的写入状态
+3. 最终读取文档验证完整性
 
-### Problem 2: Document Content Loss
-**Cause**: Write operation unsuccessful but not detected
-**Solution**:
-1. Verify return status after each write
-2. Record write status for each segment
-3. Finally read the document to verify completeness
+### 问题3：写入速度慢
+**原因**：等待时间过长或网络延迟
+**解决**：
+1. 优化等待时间（1-2秒通常足够）
+2. 考虑并行写入多个段落
+3. 使用本地缓存减少重复生成
 
-### Problem 3: Slow Write Speed
-**Cause**: Wait time too long or network latency
-**Solution**:
-1. Optimize wait time (1-2 seconds is usually sufficient)
-2. Consider parallel writing of multiple segments
-3. Use local cache to reduce repeated generation
+## 资源文件
 
-## 重要提醒
-
-### 分段写入是必须的！
-**每次使用此技能时，请务必记住：**
-1. 飞书文档API有严格的单次写入长度限制
-2. 长内容必须分段写入（每段300-500字）
-3. 段与段之间需要适当等待（1-2秒）
-4. 按逻辑分段，保持内容完整性
+### scripts/create_feishu_doc.py
+提供Python脚本实现完整的文档创建流程，包括错误处理和重试机制。
 
 ### references/feishu_api_guide.md
 飞书API使用指南，包含常见错误代码和解决方案。
 
-**Skill Features**:
-- **High versatility**: Supports various types of document content creation
-- **Intelligent segmentation**: Automatically segments intelligently based on content type
-- **Error handling**: Intelligent retry and format simplification mechanisms
-- **Progress tracking**: Real-time display of write progress and success rate
-- **Completeness verification**: Verify document completeness after creation
-- **User-friendly**: Simple interface and detailed status reports
+---
+
+**技能特点**：
+- **通用性强**：支持各种类型的文档内容创建
+- **智能分段**：根据内容类型自动智能分段
+- **错误处理**：智能重试和格式简化机制
+- **进度跟踪**：实时显示写入进度和成功率
+- **完整性验证**：创建后验证文档完整性
+- **用户友好**：简单的接口和详细的状态报告
